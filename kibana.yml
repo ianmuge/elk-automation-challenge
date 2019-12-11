@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: elk-stack
+  labels:
+    app: kibana
+spec:
+  selector:
+    app: kibana
+  ports:
+  - port: 5601
+    name: http 
+---
+apiVersion: v1               
+kind: Service                
+metadata:                    
+  name: kibana-lb        
+  namespace: elk-stack
+  labels:                    
+    app: kibana
+spec:                        
+  type: LoadBalancer         
+  selector:                  
+    app: kibana
+  ports:                     
+  - name: http               
+    port: 5601               
+    protocol: TCP  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: elk-stack
+  labels:
+    app: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana:7.5.0
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512M
+          requests:
+            cpu: 100m
+            memory: 256M
+        env:
+          - name: ELASTICSEARCH_URL
+            value: http://elasticsearch-service:9200
+          - name: ELASTICSEARCH_HOSTS
+            value: http://elasticsearch-service:9200
+        ports:
+        - containerPort: 5601
+          name: http
+          protocol: TCP
+        readinessProbe:
+            httpGet:
+              path: /app/kibana
+              port: 5601
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
