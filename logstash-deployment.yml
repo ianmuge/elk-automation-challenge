@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  namespace: elastic-system
+  labels:
+    app: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - name: logstash-container
+        image: docker.elastic.co/logstash/logstash:7.5.0
+        resources:
+            limits:
+              memory: "256Mi"
+              cpu: 1000m
+            requests:
+              memory: "128Mi"
+              cpu: 100m
+        env:
+          - name:  ELASTICSEARCH_HOST
+            value: "elasticsearch"
+          - name:  ELASTICSEARCH_PORT
+            value: "9200"
+        ports:
+        - containerPort: 5044
+        volumeMounts:
+          - name: logstash-settings-config-volume
+            mountPath: /usr/share/logstash/config
+          - name: logstash-pipeline-config-volume
+            mountPath: /usr/share/logstash/pipeline
+      volumes:
+      - name: logstash-settings-config-volume
+        configMap:
+          name: logstash-configmap
+          items:
+            - key: logstash.yml
+              path: logstash.yml
+      - name: logstash-pipeline-config-volume
+        configMap:
+          name: logstash-configmap
+          items:
+            - key: pipeline.conf
+              path: pipeline.conf

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-configmap
+  namespace: elastic-system
+  labels:
+    app: logstash
+data:
+  logstash.yml: |-
+    http.host: "0.0.0.0"
+    path.config: /usr/share/logstash/pipeline
+  pipeline.conf: |-
+    input {
+      beats {
+        port => 5044
+      }
+    }
+    output {
+      elasticsearch {
+        hosts => ['${ELASTICSEARCH_HOST:elasticsearch.logging}:${ELASTICSEARCH_PORT:9200}']
+      }
+    }
