@@ -47,6 +47,9 @@ data:
   logstash.yml: |-
     http.host: "0.0.0.0"
     path.config: /usr/share/logstash/pipeline
+    xpack.monitoring.enabled: true
+    xpack.monitoring.elasticsearch.hosts: "http://elasticsearch-service:9200"
+    xpack.monitoring.elasticsearch.sniffing: true
   pipeline.conf: |-
     input {
       beats {
@@ -55,7 +58,11 @@ data:
     }
     output {
       elasticsearch {
-        hosts => ['${ELASTICSEARCH_HOST:elasticsearch-service}:${ELASTICSEARCH_PORT:9200}']
+        hosts => ['http://elasticsearch-service:9200']
+        index => "%{[@metadata][beat]}-%{[@metadata][version]}"
+      }
+      stdout { 
+        codec => rubydebug 
       }
     }
 ---
@@ -81,16 +88,11 @@ spec:
         image: docker.elastic.co/logstash/logstash:7.5.0
         resources:
             limits:
-              memory: "256M"
+              memory: "512M"
               cpu: 1000m
             requests:
-              memory: "128M"
+              memory: "256M"
               cpu: 100m
-        env:
-          - name:  ELASTICSEARCH_HOST
-            value: "elasticsearch-service"
-          - name:  ELASTICSEARCH_PORT
-            value: "9200"
         ports:
         - containerPort: 5044
           name: http
@@ -98,16 +100,19 @@ spec:
         - containerPort: 9600
           name: api
           protocol: TCP
-        livenessProbe:
+        readinessProbe:
             tcpSocket:
               port: 5044
-            initialDelaySeconds: 20
+            initialDelaySeconds: 30
             periodSeconds: 10
+            failureThreshold: 10
         volumeMounts:
           - name: logstash-settings-config-volume
             mountPath: /usr/share/logstash/config
           - name: logstash-pipeline-config-volume
             mountPath: /usr/share/logstash/pipeline
+        command:
+        - logstash
       volumes:
       - name: logstash-settings-config-volume
         configMap:
