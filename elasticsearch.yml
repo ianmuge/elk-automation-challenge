@@ -17,7 +17,7 @@ metadata:
 spec:
   selector:
     app: elasticsearch
-  # clusterIP: None
+  clusterIP: None
   ports:
     - port: 9200
       name: http
@@ -47,7 +47,7 @@ metadata:
   namespace: elk-stack
 spec:
   serviceName: elasticsearch
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: elasticsearch
@@ -56,29 +56,28 @@ spec:
       labels:
         app: elasticsearch
     spec:
-      affinity:
-        
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchExpressions:
-                  - key: app
-                    operator: In
-                    values:
-                      - elasticsearch
-                topologyKey: kubernetes.io/hostname
+      # affinity: 
+      #   podAntiAffinity:
+      #     preferredDuringSchedulingIgnoredDuringExecution:
+      #       - weight: 100
+      #         podAffinityTerm:
+      #           labelSelector:
+      #             matchExpressions:
+      #             - key: app
+      #               operator: In
+      #               values:
+      #                 - elasticsearch
+      #           topologyKey: kubernetes.io/hostname
       containers:
       - name: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
         resources:
             limits:
               cpu: 1000m
-              memory: 756M
+              memory: 600M
             requests:
               cpu: 100m
-              memory: 512M
+              memory: 400M
         ports:
         - containerPort: 9200
           name: http
@@ -89,14 +88,16 @@ spec:
         livenessProbe:
             tcpSocket:
               port: 9300
-            initialDelaySeconds: 20
+            initialDelaySeconds: 90
             periodSeconds: 10
+            failureThreshold: 10
         readinessProbe:
             httpGet:
-              path: /_cluster/health
+              path: /
               port: 9200
             initialDelaySeconds: 20
-            timeoutSeconds: 5
+            timeoutSeconds: 10
+            failureThreshold: 10
         volumeMounts:
         - name: data
           mountPath: /usr/share/elasticsearch/data
@@ -108,11 +109,13 @@ spec:
               fieldRef:
                 fieldPath: metadata.name
           - name: discovery.seed_hosts
-            value: "elasticsearch-service.elk-stack.svc.cluster.local"
-          - name: cluster.initial_master_nodes
-            value: "elasticsearch-0,elasticsearch-1,elasticsearch-2"
+            value: "elasticsearch-service"
+          # - name: cluster.initial_master_nodes
+          #   value: "elasticsearch-0,elasticsearch-1"
           - name: ES_JAVA_OPTS
             value: "-Xms256m -Xmx256m"
+          - name: xpack.security.enabled
+            value: "false"
       initContainers:
       - name: fix-permissions
         image: busybox
@@ -146,5 +149,5 @@ spec:
       storageClassName: standard
       resources:
         requests:
-          storage: 5Gi
+          storage: 20Gi
 
