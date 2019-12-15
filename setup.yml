@@ -11,3 +11,15 @@ metadata:
 provisioner: kubernetes.io/gce-pd
 parameters:
   type: pd-ssd
+---
+# apiVersion: v1
+# kind: ResourceQuota
+# metadata:
+#   name: pod-quota
+#   namespace: elk-stack
+# spec:
+#   hard:
+#     requests.cpu: "7"
+#     requests.memory: 10Gi
+#     limits.cpu: "10"
+#     limits.memory: 20Gi
