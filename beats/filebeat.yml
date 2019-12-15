@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: filebeat-config
-  namespace: kube-system
+  namespace: elk-stack
   labels:
     k8s-app: filebeat
 data:
@@ -20,33 +20,36 @@ data:
                 logs_path: "/var/log/containers/"
 
     # To enable hints based autodiscover, remove `filebeat.inputs` configuration and uncomment this:
-    #filebeat.autodiscover:
-    #  providers:
-    #    - type: kubernetes
-    #      host: ${NODE_NAME}
-    #      hints.enabled: true
-    #      hints.default_config:
-    #        type: container
-    #        paths:
-    #          - /var/log/containers/*${data.kubernetes.container.id}.log
+    filebeat.autodiscover:
+     providers:
+       - type: kubernetes
+         node: ${NODE_NAME}
+         hints.enabled: true
+         hints.default_config:
+           type: container
+           paths:
+             - /var/log/containers/*${data.kubernetes.container.id}.log
 
     processors:
       - add_cloud_metadata:
       - add_host_metadata:
 
-    cloud.id: ${ELASTIC_CLOUD_ID}
-    cloud.auth: ${ELASTIC_CLOUD_AUTH}
+    # cloud.id: ${ELASTIC_CLOUD_ID}
+    # cloud.auth: ${ELASTIC_CLOUD_AUTH}
 
     output.elasticsearch:
-      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
-      username: ${ELASTICSEARCH_USERNAME}
-      password: ${ELASTICSEARCH_PASSWORD}
+      hosts: ['${ELASTICSEARCH_HOST:elasticsearch-service}:${ELASTICSEARCH_PORT:9200}']
+      # username: ${ELASTICSEARCH_USERNAME}
+      # password: ${ELASTICSEARCH_PASSWORD}
+    setup.kibana.host: "http://kibana-service:5601"
+    setup.dashboards.enabled: true
+    # setup.dashboards.index: "filebeat-*"
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: filebeat
-  namespace: kube-system
+  namespace: elk-stack
   labels:
     k8s-app: filebeat
 spec:
@@ -71,17 +74,17 @@ spec:
         ]
         env:
         - name: ELASTICSEARCH_HOST
-          value: elasticsearch
+          value: elasticsearch-service
         - name: ELASTICSEARCH_PORT
           value: "9200"
-        - name: ELASTICSEARCH_USERNAME
-          value: elastic
-        - name: ELASTICSEARCH_PASSWORD
-          value: changeme
-        - name: ELASTIC_CLOUD_ID
-          value:
-        - name: ELASTIC_CLOUD_AUTH
-          value:
+        # - name: ELASTICSEARCH_USERNAME
+        #   value: elastic
+        # - name: ELASTICSEARCH_PASSWORD
+        #   value: changeme
+        # - name: ELASTIC_CLOUD_ID
+        #   value:
+        # - name: ELASTIC_CLOUD_AUTH
+        #   value:
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -92,9 +95,10 @@ spec:
           #privileged: true
         resources:
           limits:
+            cpu: 500m
             memory: 200Mi
           requests:
-            cpu: 100m
+            cpu: 50m
             memory: 100Mi
         volumeMounts:
         - name: config
@@ -133,7 +137,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: filebeat
-  namespace: kube-system
+  namespace: elk-stack
 roleRef:
   kind: ClusterRole
   name: filebeat
@@ -159,7 +163,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: filebeat
-  namespace: kube-system
+  namespace: elk-stack
   labels:
     k8s-app: filebeat
 ---

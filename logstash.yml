@@ -59,7 +59,7 @@ data:
     output {
       elasticsearch {
         hosts => ['http://elasticsearch-service:9200']
-        index => "%{[@metadata][beat]}-%{[@metadata][version]}"
+        index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
       }
       stdout { 
         codec => rubydebug 
