@@ -70,3 +70,11 @@ spec:
               port: 5601
             initialDelaySeconds: 20
             timeoutSeconds: 5
+            failureThreshold: 10
+        livenessProbe:
+            httpGet:
+              path: /app/kibana
+              port: 5601
+            initialDelaySeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 10

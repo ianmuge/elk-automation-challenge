@@ -106,6 +106,12 @@ spec:
             initialDelaySeconds: 30
             periodSeconds: 10
             failureThreshold: 10
+        livenessProbe:
+            tcpSocket:
+              port: 5044
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 10
         volumeMounts:
           - name: logstash-settings-config-volume
             mountPath: /usr/share/logstash/config
