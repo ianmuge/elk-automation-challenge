@@ -30,7 +30,7 @@ pipeline {
                 location: env.LOCATION,
                 manifestPattern: 'compiled.yml',
                 credentialsId: env.CREDENTIALS_ID,
-                verifyDeployments: true])
+                verifyDeployments: false])
             }
         }
         stage("send mail"){
