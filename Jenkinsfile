@@ -22,7 +22,10 @@ pipeline {
         }
         stage('Deploy Beats') {
             steps{
-                step()
+                kubernetesDeploy(kubeconfigId: 'kubeconfig',               // REQUIRED
+                 configs: 'beats/auditbeat.yml,beats/filebeat.yml,beats/metricbeat.yml', // REQUIRED
+                 enableConfigSubstitution: true
+)
             }
         }
     }    
