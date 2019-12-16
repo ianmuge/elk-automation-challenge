@@ -4,7 +4,7 @@ pipeline {
         PROJECT_ID = 'interviews-dev'
         CLUSTER_NAME = 'interview-cluster'
         LOCATION = 'europe-west1-b'
-        CREDENTIALS_ID = 'gke'
+        CREDENTIALS_ID = 'interviews'
     }
     stages {
         stage("Checkout code") {
