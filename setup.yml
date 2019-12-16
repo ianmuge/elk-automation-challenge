@@ -11,7 +11,7 @@ metadata:
 provisioner: kubernetes.io/gce-pd
 parameters:
   type: pd-ssd
----
+# ---
 # apiVersion: v1
 # kind: ResourceQuota
 # metadata:
