@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
     environment {
@@ -13,20 +14,23 @@ pipeline {
                 checkout scm
             }
         }        
-        stage('Deploy ELK') {
+        stage('Compile manifests') {
             steps{
-                kubernetesDeploy(kubeconfigId: 'kubeconfig',               // REQUIRED
-                 configs: 'elasticsearch.yml,kibana.yml,logstash.yml', // REQUIRED
-                 enableConfigSubstitution: true
-)
+            sh """ 
+                kubectl kustomize . > compiled.yml 
+                """        
             }
         }
-        stage('Deploy Beats') {
+        stage('Deploy to GKE') {
             steps{
-                kubernetesDeploy(kubeconfigId: 'kubeconfig',               // REQUIRED
-                 configs: 'beats/auditbeat.yml,beats/filebeat.yml,beats/metricbeat.yml', // REQUIRED
-                 enableConfigSubstitution: true
-)
+                step([
+                $class: 'KubernetesEngineBuilder',
+                projectId: env.PROJECT_ID,
+                clusterName: env.CLUSTER_NAME,
+                location: env.LOCATION,
+                manifestPattern: 'compiled.yml',
+                credentialsId: env.CREDENTIALS_ID,
+                verifyDeployments: true])
             }
         }
         stage("send mail"){
@@ -34,7 +38,7 @@ pipeline {
                 mail (
                     to: env.NOTIFY_MAIL,
                     subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is completed successfully",
-                    body: "Please go to ${env.BUILD_URL}.")
+                    body: "Build URL to ${env.BUILD_URL}.")
             }
         }
     }    
