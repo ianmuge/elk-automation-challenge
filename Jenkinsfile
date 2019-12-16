@@ -12,9 +12,17 @@ pipeline {
                 checkout scm
             }
         }        
-        stage('Deploy to GKE') {
+        stage('Deploy ELK') {
             steps{
-                step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'beats/', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
+                kubernetesDeploy(kubeconfigId: 'kubeconfig',               // REQUIRED
+                 configs: 'elasticsearch.yml,kibana.yml,logstash.yml', // REQUIRED
+                 enableConfigSubstitution: true
+)
+            }
+        }
+        stage('Deploy Beats') {
+            steps{
+                step()
             }
         }
     }    
