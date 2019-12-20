@@ -46,14 +46,14 @@ pipeline {
          stage("Integration testing"){
             steps{
             sh """
-                python -m unittest discover -s ./tests/integration -t ./tests/integration
+                python3 -m unittest discover -s ./tests/integration -t ./tests/integration
                 """
             }
          }
          stage("Performance testing"){
             steps{
             sh """
-                python ./tests/performance/main.py
+                python3 ./tests/performance/main.py
                 """
             }
          }
@@ -69,7 +69,7 @@ pipeline {
          stage("Infrastructure testing"){
             steps{
             sh """
-                python -m unittest discover -s ./tests/infrastructure -t ./tests/infrastructure
+                python3 -m unittest discover -s ./tests/infrastructure -t ./tests/infrastructure
                 """
             }
          }
