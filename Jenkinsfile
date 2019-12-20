@@ -36,8 +36,8 @@ pipeline {
         stage("Prepare for Infrastructure testing"){
          steps {
             script {
-                withCredentials([file(credentialsId: 'service-account', variable: 'service-account')]) {
-                   sh "cp \$service-account ./infrastructure/service-account.json"
+                withCredentials([file(credentialsId: 'service-account', variable: 'service_account')]) {
+                   sh "cp \$service_account ./infrastructure/service-account.json"
                 }
                 }
             }
