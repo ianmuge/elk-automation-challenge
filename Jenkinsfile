@@ -76,14 +76,8 @@ pipeline {
          stage("Infrastructure testing"){
             steps{
             sh """
+                . env/bin/activate
                 python3 -m unittest discover -s ./tests/infrastructure -t ./tests/infrastructure
-                """
-            }
-         }
-         stage("Deactivate Virtual Environment"){
-            steps{
-            sh """
-                deactivate
                 """
             }
          }
