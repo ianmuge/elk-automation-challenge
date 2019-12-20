@@ -33,13 +33,41 @@ pipeline {
                 verifyDeployments: false])
             }
         }
-        // stage("send mail"){
-        //     steps{
-        //         mail (
-        //             to: env.NOTIFY_MAIL,
-        //             subject: "Job '${env.JOB_NAME}' (${env.BUILD_NUMBER}) is completed successfully",
-        //             body: "Build URL to ${env.BUILD_URL}.")
-        //     }
-        // }
+         stage("Create Virtual Environment"){
+            steps{
+            sh """
+                pip3 install --user virtualenv
+                python3 -m venv env
+                source env/bin/activate
+                pip3 install -r requirements.txt
+                """
+            }
+         }
+         stage("Integration testing"){
+            steps{
+            sh """
+                python -m unittest discover -s ./tests/integration -t ./tests/integration
+                """
+            }
+         }
+         stage("Performance testing"){
+            steps{
+            sh """
+                python ./tests/performance/main.py
+                """
+            }
+         }
+         stage("Prepare for Infrastructure testing"){
+            withCredentials([file(credentialsId: 'service-account', variable: 'service-account')]) {
+               sh "cp \$service-account ./infrastructure/service-account.json"
+            }
+         }
+         stage("Infrastructure testing"){
+            steps{
+            sh """
+                python -m unittest discover -s ./tests/infrastructure -t ./tests/infrastructure
+                """
+            }
+         }
     }    
 }

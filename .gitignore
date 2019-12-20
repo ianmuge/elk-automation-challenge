@@ -3,3 +3,4 @@ venv/
 config
 **/*.json
 .pytest_cache
+__pycache__/
