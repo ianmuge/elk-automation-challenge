@@ -37,7 +37,7 @@ pipeline {
          steps {
             script {
                 withCredentials([file(credentialsId: 'service-account', variable: 'service-account')]) {
-                   sh "cp \$service-account ./infrastructure/service-account.json"
+                   sh "cp $service-account ./infrastructure/service-account.json"
                 }
                 }
             }
