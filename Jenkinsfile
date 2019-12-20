@@ -33,30 +33,7 @@ pipeline {
                 verifyDeployments: false])
             }
         }
-         stage("Create Virtual Environment"){
-            steps{
-            sh """
-                python3 -m venv env
-                . env/bin/activate
-                pip3 install -r requirements.txt
-                """
-            }
-         }
-         stage("Integration testing"){
-            steps{
-            sh """
-                python3 -m unittest discover -s ./tests/integration -t ./tests/integration
-                """
-            }
-         }
-         stage("Performance testing"){
-            steps{
-            sh """
-                python3 ./tests/performance/main.py
-                """
-            }
-         }
-         stage("Prepare for Infrastructure testing"){
+        stage("Prepare for Infrastructure testing"){
          steps {
             script {
                 withCredentials([file(credentialsId: 'service-account', variable: 'service-account')]) {
@@ -65,9 +42,14 @@ pipeline {
                 }
             }
          }
-         stage("Infrastructure testing"){
+         stage("Create Virtual Environment and run tests"){
             steps{
             sh """
+                python3 -m venv env
+                . env/bin/activate
+                pip3 install -r requirements.txt
+                python3 -m unittest discover -s ./tests/integration -t ./tests/integration
+                python3 ./tests/performance/main.py
                 python3 -m unittest discover -s ./tests/infrastructure -t ./tests/infrastructure
                 """
             }
