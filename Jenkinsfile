@@ -57,7 +57,7 @@ pipeline {
                 """
             }
          }
-         stage("Prepare for Infrastructure testing"){
+         node("Prepare for Infrastructure testing"){
             withCredentials([file(credentialsId: 'service-account', variable: 'service-account')]) {
                sh "cp \$service-account ./infrastructure/service-account.json"
             }
