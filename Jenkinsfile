@@ -72,5 +72,12 @@ pipeline {
                 """
             }
          }
+         stage("Deactivate Virtual Environment"){
+            steps{
+            sh """
+                deactivate
+                """
+            }
+         }
     }    
 }
