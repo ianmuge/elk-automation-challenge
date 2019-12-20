@@ -36,13 +36,14 @@ data:
 
     # cloud.id: ${ELASTIC_CLOUD_ID}
     # cloud.auth: ${ELASTIC_CLOUD_AUTH}
-
-    output.elasticsearch:
-      hosts: ['${ELASTICSEARCH_HOST:elasticsearch-service}:${ELASTICSEARCH_PORT:9200}']
+    output.logstash:
+          hosts: ['logstash-service:5044']
+#    output.elasticsearch:
+#      hosts: ['${ELASTICSEARCH_HOST:elasticsearch-service}:${ELASTICSEARCH_PORT:9200}']
       # username: ${ELASTICSEARCH_USERNAME}
       # password: ${ELASTICSEARCH_PASSWORD}
-    setup.kibana.host: "http://kibana-service:5601"
-    setup.dashboards.enabled: true
+#    setup.kibana.host: "http://kibana-service:5601"
+#    setup.dashboards.enabled: true
     # setup.dashboards.index: "filebeat-*"
 ---
 apiVersion: apps/v1
