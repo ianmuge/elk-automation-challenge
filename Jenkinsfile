@@ -36,7 +36,6 @@ pipeline {
          stage("Create Virtual Environment"){
             steps{
             sh """
-                pip3 install --user virtualenv
                 python3 -m venv env
                 source env/bin/activate
                 pip3 install -r requirements.txt
