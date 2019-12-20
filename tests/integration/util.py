@@ -35,8 +35,8 @@ def sample_data(url,index):
 def bulk_sample_data(base_url,index):
     try:
         file = cfg.es_sample_data_path
-        if file and not os.path.isfile(file):
-            raise FileNotFoundError('File not found: ' + file)
+        # if file and not os.path.isfile(file):
+        #     raise FileNotFoundError('File not found: ' + file)
         url = "{0}{1}{2}".format(base_url, index, "/_bulk")
         file = open(file, 'rb')
         data = file.read()

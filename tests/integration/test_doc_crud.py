@@ -53,8 +53,8 @@ class TestDocCrud(unittest.TestCase):
 
     def test_bulk_api(self):
         file=cfg.es_sample_data_path
-        if file and not os.path.isfile(file):
-            raise FileNotFoundError('File not found: ' + file)
+        # if file and not os.path.isfile(file):
+        #     raise FileNotFoundError('File not found: ' + file)
         url = "{0}{1}{2}".format(self.endpoint, self.index, "/_bulk")
         file=open(file, 'rb')
         data = file.read()
