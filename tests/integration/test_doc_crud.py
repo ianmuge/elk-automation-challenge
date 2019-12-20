@@ -85,7 +85,7 @@ class TestDocCrud(unittest.TestCase):
         json_data = response.json()
         # print(json_data["hits"]['total']['value'])
         self.assertEqual(json_data["timed_out"], False)
-        self.assertGreaterEqual(json_data["hits"]['total']['value'], 100)
+        self.assertGreaterEqual(json_data["hits"]['total']['value'], 1)
 
 if __name__ == "__main__":
     unittest.main()
