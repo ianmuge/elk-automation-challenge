@@ -37,7 +37,7 @@ pipeline {
             steps{
             sh """
                 python3 -m venv env
-                source env/bin/activate
+                . env/bin/activate
                 pip3 install -r requirements.txt
                 """
             }
