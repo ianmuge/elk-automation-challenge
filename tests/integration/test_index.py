@@ -13,7 +13,7 @@ class TestIndex(unittest.TestCase):
     def test_index_create(self):
         url="{0}{1}".format(self.endpoint,self.index)
         response=util.send_data(url,"PUT")
-        self.assertEqual(response.status_code, 200)
+        self.assertIn(response.status_code, [200,201])
 
     def test_index_exists(self):
         util.create_test_index(self.endpoint, self.index)
