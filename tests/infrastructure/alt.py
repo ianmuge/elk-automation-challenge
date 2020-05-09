@@ -20,7 +20,7 @@ def test_gke():
     project_id = "interviews-dev"
     zone = "europe-west1-b"
     cluster_id = "interview-cluster"
-    namespace = "elk-stack"
+    namespace = "monitoring"
 
     SCOPES = ['https://www.googleapis.com/auth/cloud-platform']
     credentials = service_account.Credentials.from_service_account_file('./service-account.json', scopes=SCOPES)

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: elk-stack
+  name: monitoring
 ---
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
   name: ssd
-  namespace: elk-stack
+  namespace: monitoring
 provisioner: kubernetes.io/gce-pd
 parameters:
   type: pd-ssd
@@ -16,7 +16,7 @@ parameters:
 # kind: ResourceQuota
 # metadata:
 #   name: pod-quota
-#   namespace: elk-stack
+#   namespace: monitoring
 # spec:
 #   hard:
 #     requests.cpu: "7"

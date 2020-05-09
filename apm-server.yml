@@ -1,0 +1,94 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: apm-server-svc
+  namespace: monitoring
+  labels:
+    app: apm-server
+spec:
+  type: ClusterIP
+  selector:
+    app: apm-server
+  ports:
+  - name: http
+    port: 8200
+    targetPort: 8200
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: apm-server
+  namespace: monitoring
+  labels:
+    app: apm-server
+data:
+  apm-server.yml: |-
+    apm-server.host: "0.0.0.0:8200"
+    apm-server.rum.enabled: true
+    apm-server.capture_personal_data: true
+    apm-server.kibana.path: /kibana
+    apm-server.kibana.enabled: true
+    apm-server.kibana.host: "http://kibana-svc:5601"
+    setup.kibana.host: "http://kibana-svc:5601"
+    monitoring.enabled: true
+    monitoring.elasticsearch.hosts: "http://elasticsearch-coordinating-svc:9200"
+    # output.logstash.hosts: 'logstash-svc:5044'
+    output.elasticsearch.hosts: '${ELASTICSEARCH_HOST:elasticsearch-coordinating-svc}:${ELASTICSEARCH_PORT:9200}'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apm-server
+  namespace: monitoring
+  labels:
+    app: apm-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apm-server
+  template:
+    metadata:
+      labels:
+        app: apm-server
+    spec:
+      containers:
+      - name: apm-server
+        image: docker.elastic.co/apm/apm-server:7.5.0
+        resources:
+            limits:
+              memory: "512M"
+              cpu: 1000m
+            requests:
+              memory: "256M"
+              cpu: 100m
+        ports:
+        - containerPort: 8200
+          name: http
+          protocol: TCP
+        # env:
+        # - name: ELASTICSEARCH_HOST
+        #   value: elasticsearch-coordinating-svc
+        # - name: ELASTICSEARCH_PORT
+        #   value: "9200"
+        readinessProbe:
+            tcpSocket:
+              port: 8200
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 10
+        livenessProbe:
+            tcpSocket:
+              port: 8200
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 10
+        volumeMounts:
+          - name: apm-server-settings-config-volume
+            mountPath: /usr/share/apm-server/apm-server.yml
+            readOnly: true
+            subPath: apm-server.yml
+      volumes:
+      - name: apm-server-settings-config-volume
+        configMap:
+          name: apm-server

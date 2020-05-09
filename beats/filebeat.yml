@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: filebeat-config
-  namespace: elk-stack
+  namespace: monitoring
   labels:
     k8s-app: filebeat
 data:
@@ -34,23 +34,17 @@ data:
       - add_cloud_metadata:
       - add_host_metadata:
 
-    # cloud.id: ${ELASTIC_CLOUD_ID}
-    # cloud.auth: ${ELASTIC_CLOUD_AUTH}
-    output.logstash:
-          hosts: ['logstash-service:5044']
-#    output.elasticsearch:
-#      hosts: ['${ELASTICSEARCH_HOST:elasticsearch-service}:${ELASTICSEARCH_PORT:9200}']
-      # username: ${ELASTICSEARCH_USERNAME}
-      # password: ${ELASTICSEARCH_PASSWORD}
-#    setup.kibana.host: "http://kibana-service:5601"
-#    setup.dashboards.enabled: true
-    # setup.dashboards.index: "filebeat-*"
+    output.logstash.hosts: 'logstash-svc:5044'
+    setup.kibana.host: "http://kibana-svc:5601"
+    setup.dashboards.enabled: true
+#    output.elasticsearch.hosts: ['${ELASTICSEARCH_HOST:elasticsearch-coordinating-svc}:${ELASTICSEARCH_PORT:9200}']
+
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: filebeat
-  namespace: elk-stack
+  namespace: monitoring
   labels:
     k8s-app: filebeat
 spec:
@@ -78,14 +72,6 @@ spec:
           value: elasticsearch-service
         - name: ELASTICSEARCH_PORT
           value: "9200"
-        # - name: ELASTICSEARCH_USERNAME
-        #   value: elastic
-        # - name: ELASTICSEARCH_PASSWORD
-        #   value: changeme
-        # - name: ELASTIC_CLOUD_ID
-        #   value:
-        # - name: ELASTIC_CLOUD_AUTH
-        #   value:
         - name: NODE_NAME
           valueFrom:
             fieldRef:
@@ -138,7 +124,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: filebeat
-  namespace: elk-stack
+  namespace: monitoring
 roleRef:
   kind: ClusterRole
   name: filebeat
@@ -164,7 +150,6 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: filebeat
-  namespace: elk-stack
+  namespace: monitoring
   labels:
     k8s-app: filebeat
----
