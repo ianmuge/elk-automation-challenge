@@ -31,9 +31,9 @@ data:
     apm-server.kibana.host: "http://kibana-svc:5601"
     setup.kibana.host: "http://kibana-svc:5601"
     monitoring.enabled: true
-    monitoring.elasticsearch.hosts: "http://elasticsearch-coordinating-svc:9200"
-    # output.logstash.hosts: 'logstash-svc:5044'
-    output.elasticsearch.hosts: '${ELASTICSEARCH_HOST:elasticsearch-coordinating-svc}:${ELASTICSEARCH_PORT:9200}'
+    monitoring.elasticsearch.hosts: "http://elasticsearch-svc:9200"
+    output.logstash.hosts: 'logstash-svc:5044'
+    # output.elasticsearch.hosts: '${ELASTICSEARCH_HOST:elasticsearch-svc}:${ELASTICSEARCH_PORT:9200}'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
       - name: apm-server
-        image: docker.elastic.co/apm/apm-server:7.5.0
+        image: docker.elastic.co/apm/apm-server:7.6.0
         resources:
             limits:
               memory: "512M"
@@ -68,7 +68,7 @@ spec:
           protocol: TCP
         # env:
         # - name: ELASTICSEARCH_HOST
-        #   value: elasticsearch-coordinating-svc
+        #   value: elasticsearch-svc
         # - name: ELASTICSEARCH_PORT
         #   value: "9200"
         readinessProbe:

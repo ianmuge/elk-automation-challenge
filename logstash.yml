@@ -29,7 +29,7 @@ data:
     http.host: "0.0.0.0"
     path.config: /usr/share/logstash/pipeline
     xpack.monitoring.enabled: true
-    xpack.monitoring.elasticsearch.hosts: "http://elasticsearch-coordinating-svc:9200"
+    xpack.monitoring.elasticsearch.hosts: "http://elasticsearch-svc:9200"
   pipeline.conf: |-
     input {
       beats {
@@ -38,7 +38,7 @@ data:
     }
     output {
       elasticsearch {
-        hosts => ['http://elasticsearch-coordinating-svc:9200']
+        hosts => ['http://elasticsearch-svc:9200']
         index => "%{[@metadata][beat]}-%{[@metadata][version]}-%{+YYYY.MM.dd}"
       }
       stdout { 
@@ -65,7 +65,7 @@ spec:
     spec:
       containers:
       - name: logstash
-        image: docker.elastic.co/logstash/logstash:7.5.0
+        image: docker.elastic.co/logstash/logstash:7.6.0
         resources:
             limits:
               memory: "512M"

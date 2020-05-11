@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: auditbeat-config
-  namespace: monitoring
+  namespace: kube-system
   labels:
     k8s-app: auditbeat
 data:
@@ -18,17 +18,17 @@ data:
       - add_cloud_metadata:
       - add_host_metadata:
 
-    output.logstash.hosts: 'logstash-svc:5044'
-    setup.kibana.host: "http://kibana-svc:5601"
+    output.logstash.hosts: 'logstash-svc.monitoring.svc.cluster.local:5044'
+    setup.kibana.host: "http://kibana-svc.monitoring.svc.cluster.local:5601"
     setup.dashboards.enabled: true
     # setup.dashboards.index: "auditbeat-*"
-#    output.elasticsearch.hosts: ['${ELASTICSEARCH_HOST:elasticsearch-coordinating-svc}:${ELASTICSEARCH_PORT:9200}']
+#    output.elasticsearch.hosts: ['${ELASTICSEARCH_HOST:elasticsearch-svc.monitoring.svc.cluster.local}:${ELASTICSEARCH_PORT:9200}']
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: auditbeat-daemonset-modules
-  namespace: monitoring
+  namespace: kube-system
   labels:
     k8s-app: auditbeat
 data:
@@ -55,7 +55,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: auditbeat
-  namespace: monitoring
+  namespace: kube-system
   labels:
     k8s-app: auditbeat
 spec:
@@ -73,13 +73,13 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: auditbeat
-        image: docker.elastic.co/beats/auditbeat:7.5.0
+        image: docker.elastic.co/beats/auditbeat:7.6.0
         args: [
           "-c", "/etc/auditbeat.yml"
         ]
         env:
         - name: ELASTICSEARCH_HOST
-          value: elasticsearch-coordinating-svc
+          value: elasticsearch-svc.monitoring.svc.cluster.local
         - name: ELASTICSEARCH_PORT
           value: "9200"
         securityContext:
@@ -147,11 +147,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: auditbeat
-  namespace: monitoring
+  namespace: kube-system
 subjects:
 - kind: ServiceAccount
   name: auditbeat
-  namespace: monitoring
+  namespace: kube-system
 roleRef:
   kind: ClusterRole
   name: auditbeat
@@ -175,6 +175,6 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: auditbeat
-  namespace: monitoring
+  namespace: kube-system
   labels:
     k8s-app: auditbeat

@@ -38,7 +38,7 @@ metadata:
     app: kibana
 data:
   kibana.yml: |-
-    elasticsearch.hosts: "http://elasticsearch-coordinating-svc:9200"
+    elasticsearch.hosts: "http://elasticsearch-svc:9200"
     xpack.monitoring.enabled: true
     xpack.monitoring.kibana.collection.enabled: true
     server.host: "0.0.0.0"
@@ -62,7 +62,7 @@ spec:
     spec:
       containers:
       - name: kibana
-        image: docker.elastic.co/kibana/kibana:7.5.0
+        image: docker.elastic.co/kibana/kibana:7.6.0
         resources:
           limits:
             cpu: 1000m
