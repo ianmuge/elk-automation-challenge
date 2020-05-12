@@ -2,11 +2,11 @@
 pipeline {
     agent any
     environment {
-        PROJECT_ID = 'interviews-dev'
-        CLUSTER_NAME = 'interview-cluster'
-        LOCATION = 'europe-west1-b'
-        CREDENTIALS_ID = 'interviews'
-        NOTIFY_MAIL='ian.muge@gmail.com'
+        PROJECT_ID = ''
+        CLUSTER_NAME = ''
+        LOCATION = ''
+        CREDENTIALS_ID = ''
+        NOTIFY_MAIL=''
     }
     stages {
         stage("Checkout code") {
